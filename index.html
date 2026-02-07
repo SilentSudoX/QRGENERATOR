@@ -1,1 +1,142 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional QR Generator</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Input Focus Glow */
+        .custom-input:focus {
+            outline: none;
+            border-color: #38bdf8; /* Sky 400 */
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Ensure QR code image fits container cleanly */
+        #qrcode img {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
+        
+        <div class="p-6 border-b border-slate-700 bg-slate-800">
+            <h1 class="text-2xl font-bold text-center text-sky-400 uppercase tracking-wider">QR Code Pro</h1>
+        </div>
+
+        <div class="p-6 space-y-6">
+            
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Enter Content</label>
+                <textarea 
+                    id="qrText" 
+                    rows="4" 
+                    placeholder="Paste your URL, text, or data here..." 
+                    class="w-full p-4 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 custom-input transition-all resize-none text-base"
+                ></textarea>
+            </div>
+
+            <button 
+                onclick="generateQRCode()" 
+                class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg text-lg uppercase tracking-wide"
+            >
+                Generate QR Code
+            </button>
+
+            <div id="resultContainer" class="hidden flex-col items-center space-y-6 pt-4 border-t border-slate-700 animate-fade">
+                
+                <div class="bg-white p-4 rounded-xl shadow-lg flex justify-center items-center mx-auto">
+                    <div id="qrcode"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 w-full">
+                    <button 
+                        onclick="downloadQRCode()" 
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download
+                    </button>
+                    
+                    <button 
+                        onclick="clearInterface()" 
+                        class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2 px-4 rounded-lg transition-colors"
+                    >
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const qrInput = document.getElementById('qrText');
+        const qrContainer = document.getElementById('qrcode');
+        const resultContainer = document.getElementById('resultContainer');
+        let qrCodeObj = null;
+
+        function generateQRCode() {
+            const text = qrInput.value.trim();
+
+            if (!text) {
+                alert("Please enter some text first.");
+                return;
+            }
+
+            // Clear previous QR
+            qrContainer.innerHTML = "";
+            resultContainer.classList.remove('hidden');
+
+            // Wait for UI to update then generate
+            // Width/Height changed to 200 for smaller size
+            setTimeout(() => {
+                qrCodeObj = new QRCode(qrContainer, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }, 50);
+        }
+
+        function downloadQRCode() {
+            const img = qrContainer.querySelector("img");
+            
+            if (img && img.src) {
+                const link = document.createElement("a");
+                link.href = img.src;
+                link.download = "QR_Code_" + Date.now() + ".png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function clearInterface() {
+            qrInput.value = "";
+            qrContainer.innerHTML = "";
+            resultContainer.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
